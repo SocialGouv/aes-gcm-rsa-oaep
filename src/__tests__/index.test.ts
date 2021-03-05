@@ -9,7 +9,6 @@ import {
   encryptValues,
   getSealedSecret,
 } from '../index';
-import { arrayBufferToB64 } from '../utils';
 
 describe('index', () => {
   describe('encrypt and decrypt', () => {
