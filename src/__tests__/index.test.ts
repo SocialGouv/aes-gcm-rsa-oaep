@@ -208,9 +208,8 @@ bag=
         },
       });
     });
-  });
 
-  it('should getSealedSecret for scope=namespace', async () => {
+    it('should getSealedSecret for scope=namespace', async () => {
       const pemContent = `-----BEGIN CERTIFICATE-----
 MIIErjCCApagAwIBAgIRAOqAV9ZpCl1cwMunTHirqXwwDQYJKoZIhvcNAQELBQAw
 ADAeFw0yMDA1MjYwODQxMTBaFw0zMDA1MjQwODQxMTBaMAAwggIiMA0GCSqGSIb3
@@ -262,10 +261,8 @@ bag=
         },
       });
     });
-  });
 
-
-it('should getSealedSecret for scope=cluster', async () => {
+    it('should getSealedSecret for scope=cluster', async () => {
       const pemContent = `-----BEGIN CERTIFICATE-----
 MIIErjCCApagAwIBAgIRAOqAV9ZpCl1cwMunTHirqXwwDQYJKoZIhvcNAQELBQAw
 ADAeFw0yMDA1MjYwODQxMTBaFw0zMDA1MjQwODQxMTBaMAAwggIiMA0GCSqGSIb3
