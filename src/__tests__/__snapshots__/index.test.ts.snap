@@ -1,11 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`index getSealedSecret should getSealedSecret for scope=strict 1`] = `
+exports[`index getSealedSecret should getSealedSecret for scope=cluster 1`] = `
 Object {
   "apiVersion": "bitnami.com/v1alpha1",
   "kind": "SealedSecret",
   "metadata": Object {
-    "annotations": Object {},
+    "annotations": Object {
+      "sealedsecrets.bitnami.com/cluster-wide": "true",
+    },
     "name": "some-name",
     "namespace": "some-namespace",
   },
@@ -17,7 +19,9 @@ Object {
   },
   "template": Object {
     "metadata": Object {
-      "annotations": Object {},
+      "annotations": Object {
+        "sealedsecrets.bitnami.com/cluster-wide": "true",
+      },
       "name": "some-name",
     },
     "type": "Opaque",
@@ -25,7 +29,7 @@ Object {
 }
 `;
 
-exports[`index should getSealedSecret for scope=namespace 1`] = `
+exports[`index getSealedSecret should getSealedSecret for scope=namespace 1`] = `
 Object {
   "apiVersion": "bitnami.com/v1alpha1",
   "kind": "SealedSecret",
@@ -54,14 +58,12 @@ Object {
 }
 `;
 
-exports[`should getSealedSecret for scope=cluster 1`] = `
+exports[`index getSealedSecret should getSealedSecret for scope=strict 1`] = `
 Object {
   "apiVersion": "bitnami.com/v1alpha1",
   "kind": "SealedSecret",
   "metadata": Object {
-    "annotations": Object {
-      "sealedsecrets.bitnami.com/cluster-wide": "true",
-    },
+    "annotations": Object {},
     "name": "some-name",
     "namespace": "some-namespace",
   },
@@ -73,9 +75,7 @@ Object {
   },
   "template": Object {
     "metadata": Object {
-      "annotations": Object {
-        "sealedsecrets.bitnami.com/cluster-wide": "true",
-      },
+      "annotations": Object {},
       "name": "some-name",
     },
     "type": "Opaque",
