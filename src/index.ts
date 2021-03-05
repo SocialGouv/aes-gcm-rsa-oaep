@@ -223,9 +223,14 @@ export const encryptValue = async (args: EncryptValueParams): Promise<string> =>
 export const encryptValues = async (args: EncryptValuesParams) => {
   const publicKey = await getPublicKey(args.pemKey);
   const label = Buffer.from(getLabel({ scope: args.scope, namespace: args.namespace, name: args.name }));
-  const encryptedValues = Object.keys(args.values).reduce(async (a, key) => {
-    return { ...a, [key]: await encryptFromPublicKey({ publicKey, value: args.values[key], label }) };
-  }, {});
+  const encryptedValues = (
+    await Promise.all(
+      Object.keys(args.values).map(async (key) => ({
+        key,
+        value: await encryptFromPublicKey({ publicKey, value: args.values[key], label }),
+      }))
+    )
+  ).reduce((a, c) => ({ ...a, [c.key]: c.value }), {});
   return encryptedValues;
 };
 

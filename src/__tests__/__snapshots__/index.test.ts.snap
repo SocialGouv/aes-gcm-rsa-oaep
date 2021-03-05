@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`index getSealedSecret should getSealedSecret 1`] = `
+Object {
+  "apiVersion": "bitnami.com/v1alpha1",
+  "kind": "SealedSecret",
+  "metadata": Object {
+    "annotations": Object {},
+    "name": "some-name",
+    "namespace": "some-namespace",
+  },
+  "spec": Object {
+    "encryptedData": Object {
+      "value1": Any<String>,
+      "value2": Any<String>,
+    },
+  },
+  "template": Object {
+    "metadata": Object {
+      "annotations": Object {},
+      "name": "some-name",
+    },
+    "type": "Opaque",
+  },
+}
+`;
