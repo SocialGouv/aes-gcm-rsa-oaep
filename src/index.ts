@@ -1,5 +1,45 @@
+import { pki } from 'node-forge';
+
 // Utility functions come from here : https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
 import { str2ab } from './utils';
+
+type Scope = 'cluster' | 'namespace' | 'strict';
+
+type GetLabelParams = {
+  scope: Scope;
+  namespace: string;
+  name: string;
+};
+
+type EncryptValueParams = {
+  pemKey: string;
+  scope: Scope;
+  namespace: string;
+  name: string;
+  value: string;
+};
+
+type EncryptParams = {
+  publicKey: CryptoKey;
+  value: string;
+  label: Buffer;
+};
+
+type EncryptValuesParams = {
+  pemKey: string;
+  scope: Scope;
+  namespace: string;
+  name: string;
+  values: Record<string, any>;
+};
+
+type GetSealedSecretParams = {
+  pemKey: string;
+  scope: Scope;
+  namespace: string;
+  name: string;
+  values: Record<string, any>;
+};
 
 const crypto = typeof window !== 'undefined' && window.crypto ? window.crypto : require('crypto').webcrypto;
 
@@ -150,3 +190,74 @@ export async function pemPublicKeyToCryptoKey(pemContent: string): Promise<Crypt
 
   return crypto.subtle.importKey('spki', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, true, ['encrypt']);
 }
+
+const getLabel = ({ scope, namespace, name }: GetLabelParams): string => {
+  if (scope === 'cluster') {
+    return '';
+  }
+  if (scope === 'namespace') {
+    return namespace;
+  }
+  return `${namespace}/${name}`;
+};
+
+const getPublicKey = async (pemKey: string): Promise<CryptoKey> => {
+  const cert = pki.certificateFromPem(pemKey);
+  const publicKeyPem = pki.publicKeyToPem(cert.publicKey);
+  const publicKey = await pemPublicKeyToCryptoKey(publicKeyPem);
+  return publicKey;
+};
+
+export const encryptFromPublicKey = async (args: EncryptParams) =>
+  Buffer.from(await HybridEncrypt(args.publicKey, args.value, args.label)).toString('base64');
+
+export const encryptValue = async (args: EncryptValueParams): Promise<string> => {
+  const publicKey = await getPublicKey(args.pemKey);
+  const label = Buffer.from(getLabel({ scope: args.scope, namespace: args.namespace, name: args.name }));
+  const result = await encryptFromPublicKey({ publicKey, label, value: args.value });
+
+  HybridEncrypt(publicKey, args.value, label);
+  return Buffer.from(result).toString('base64');
+};
+
+export const encryptValues = async (args: EncryptValuesParams) => {
+  const publicKey = await getPublicKey(args.pemKey);
+  const label = Buffer.from(getLabel({ scope: args.scope, namespace: args.namespace, name: args.name }));
+  const encryptedValues = Object.keys(args.values).reduce(async (a, key) => {
+    return { ...a, [key]: await encryptFromPublicKey({ publicKey, value: args.values[key], label }) };
+  }, {});
+  return encryptedValues;
+};
+
+export const getSealedSecret = async (args: GetSealedSecretParams) => {
+  const encryptedData = await encryptValues(args);
+
+  const annotations = {} as Record<string, string>;
+  if (args.scope === 'cluster') {
+    annotations['sealedsecrets.bitnami.com/cluster-wide'] = 'true';
+  } else if (args.scope === 'namespace') {
+    annotations['sealedsecrets.bitnami.com/namespace-wide'] = 'true';
+  }
+
+  const manifest = {
+    apiVersion: 'bitnami.com/v1alpha1',
+    kind: 'SealedSecret',
+    metadata: {
+      annotations,
+      name: args.name,
+      namespace: args.namespace,
+    },
+    spec: {
+      encryptedData,
+    },
+    template: {
+      metadata: {
+        annotations,
+        name: args.name,
+      },
+      type: 'Opaque',
+    },
+  };
+
+  return manifest;
+};

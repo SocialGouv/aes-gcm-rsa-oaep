@@ -1,6 +1,6 @@
 # AES-GCM + RSA OAEP encryption
 
-AES-GCM + RSA-OAEP encryption/decryption using WebCrypto API in NodeJS or in the browser 
+AES-GCM + RSA-OAEP encryption/decryption using WebCrypto API in NodeJS or in the browser
 
 Tests uses `@peculiar/webcrypto` for polyfilling browser crypto api.
 
@@ -8,28 +8,60 @@ This can be used to replace [kubeseal](https://github.com/bitnami-labs/sealed-se
 
 See demo : http://socialgouv.github.io/webseal
 
-## Using x509 certificates
+## Usage
 
-To be able to use x509 certificates, you need to first extract the public key with 
-openssl :
+### High level
 
-```shell script
-openssl x509 -in ./cert.pem -pubkey -noout > certificate_publickey.pem
+```js
+import { encryptValue, encryptValues, getSealedSecret } from "@socialgouv/aes-gcm-rsa-oaep"
+
+// encrypt single value
+const encryptedValue =  encryptValue({
+  pemKey: "somekey",
+  scope: "cluster",
+  namespace: "dev",
+  name: "my-secret",
+  value: "plain-value";
+});
+
+// encrypt multiple values
+const encryptedValue =  encryptValues({
+  pemKey: "somekey",
+  scope: "cluster",
+  namespace: "dev",
+  name: "my-secret",
+  values: {
+    value1: "plain1",
+    value2: "plain2"
+  }
+});
+
+// get sealed-secret
+const sealedSecret =  getSealedSecret({
+  pemKey: "somekey",
+  scope: "cluster",
+  namespace: "dev",
+  name: "my-secret",
+  values: {
+    value1: "plain1",
+    value2: "plain2"
+  }
+});
 ```
 
-Extracting the public key form the certificate is a pain to do in JS.
+## Low level
 
-You can also use `node-forge` to do it : 
-```
-import { pki } from "node-forge";
+```js
+import { pki } from 'node-forge';
+import { HybridEncrypt, pemPublicKeyToCryptoKey } from '@socialgouv/aes-gcm-rsa-oaep';
 
-const cert = pki.certificateFromPem(
-  `-----BEGIN CERTIFICATE-----
-  ...
-  -----END CERTIFICATE-----`
-);
+const publicKeyPem = pki.publicKeyToPem(cert.publicKey);
+const publicKey = await pemPublicKeyToCryptoKey(publicKeyPem);
 
-const publikKeyPem = pki.publicKeyToPem(cert.publicKey);
+const plainText = 'Bonjour le monde';
+const label = Buffer.from('');
 
-pemPublicKeyToCryptoKey(publicKeyPem);
+const result = await HybridEncrypt(publicKey, plainText, label);
+
+const sealedText = Buffer.from(result).toString('base64');
 ```

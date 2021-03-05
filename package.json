@@ -6,7 +6,9 @@
     "name": "Clement Berthou",
     "email": "clement.berthou@benextcompany.com"
   },
-  "engines" : { "node" : ">=15" },
+  "engines": {
+    "node": ">=15"
+  },
   "scripts": {
     "test": "yarn jest --detectOpenHandles",
     "typecheck": "yarn tsc --project ./tsconfig-typecheck.json",
@@ -47,7 +49,9 @@
     "typescript-eslint-parser": "^22.0.0"
   },
   "dependencies": {
-    "hybrid-crypto-js": "^0.2.4"
+    "@types/node-forge": "^0.9.7",
+    "hybrid-crypto-js": "^0.2.4",
+    "node-forge": "^0.10.0"
   },
   "publishConfig": {
     "access": "public"
