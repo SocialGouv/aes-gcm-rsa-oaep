@@ -8,6 +8,7 @@ import {
   encryptValue,
   encryptValues,
   getSealedSecret,
+  getLabel,
 } from '../index';
 
 describe('index', () => {
@@ -152,6 +153,18 @@ bag=
       expect(encrypted.value1).toBeDefined();
       // @ts-expect-error
       expect(encrypted.value2).toBeDefined();
+    });
+  });
+
+  describe('getLabel', () => {
+    it("should set label to '' for scope=cluster", () => {
+      expect(getLabel({ scope: 'cluster', namespace: 'namespace', name: 'name' })).toEqual('');
+    });
+    it("should set label to 'namespace' for scope=namespace", () => {
+      expect(getLabel({ scope: 'namespace', namespace: 'namespace', name: 'name' })).toEqual('namespace');
+    });
+    it("should set label to 'namespace/name' for scope=strict", () => {
+      expect(getLabel({ scope: 'strict', namespace: 'namespace', name: 'name' })).toEqual('namespace/name');
     });
   });
 

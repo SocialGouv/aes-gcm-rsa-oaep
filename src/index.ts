@@ -191,7 +191,8 @@ export async function pemPublicKeyToCryptoKey(pemContent: string): Promise<Crypt
   return crypto.subtle.importKey('spki', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, true, ['encrypt']);
 }
 
-const getLabel = ({ scope, namespace, name }: GetLabelParams): string => {
+// from https://github.com/bitnami-labs/sealed-secrets/blob/4d699355c7f7f3fb9dbd4247cef9f11e4f14f26b/pkg/apis/sealed-secrets/v1alpha1/sealedsecret_expansion.go#L77
+export const getLabel = ({ scope, namespace, name }: GetLabelParams): string => {
   if (scope === 'cluster') {
     return '';
   }
@@ -201,6 +202,10 @@ const getLabel = ({ scope, namespace, name }: GetLabelParams): string => {
   return `${namespace}/${name}`;
 };
 
+/**
+ * Return public `CryptoKey` from pemKey
+ * @constructor
+ */
 const getPublicKey = async (pemKey: string): Promise<CryptoKey> => {
   const cert = pki.certificateFromPem(pemKey);
   const publicKeyPem = pki.publicKeyToPem(cert.publicKey);
@@ -211,15 +216,21 @@ const getPublicKey = async (pemKey: string): Promise<CryptoKey> => {
 export const encryptFromPublicKey = async (args: EncryptParams) =>
   Buffer.from(await HybridEncrypt(args.publicKey, args.value, args.label)).toString('base64');
 
+/**
+ * Encrypt a single value
+ * @constructor
+ */
 export const encryptValue = async (args: EncryptValueParams): Promise<string> => {
   const publicKey = await getPublicKey(args.pemKey);
   const label = Buffer.from(getLabel({ scope: args.scope, namespace: args.namespace, name: args.name }));
   const result = await encryptFromPublicKey({ publicKey, label, value: args.value });
-
-  HybridEncrypt(publicKey, args.value, label);
-  return Buffer.from(result).toString('base64');
+  return result;
 };
 
+/**
+ * Encrypt a bunch of values
+ * @constructor
+ */
 export const encryptValues = async (args: EncryptValuesParams) => {
   const publicKey = await getPublicKey(args.pemKey);
   const label = Buffer.from(getLabel({ scope: args.scope, namespace: args.namespace, name: args.name }));
@@ -227,13 +238,17 @@ export const encryptValues = async (args: EncryptValuesParams) => {
     await Promise.all(
       Object.keys(args.values).map(async (key) => ({
         key,
-        value: await encryptFromPublicKey({ publicKey, value: args.values[key], label }),
+        value: await encryptFromPublicKey({ publicKey, label, value: args.values[key] }),
       }))
     )
   ).reduce((a, c) => ({ ...a, [c.key]: c.value }), {});
   return encryptedValues;
 };
 
+/**
+ * Create a sealed-secret manifest and encrypt values
+ * @constructor
+ */
 export const getSealedSecret = async (args: GetSealedSecretParams) => {
   const encryptedData = await encryptValues(args);
 
