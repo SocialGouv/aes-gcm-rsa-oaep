@@ -16,15 +16,15 @@ Object {
       "value1": Any<String>,
       "value2": Any<String>,
     },
-  },
-  "template": Object {
-    "metadata": Object {
-      "annotations": Object {
-        "sealedsecrets.bitnami.com/cluster-wide": "true",
+    "template": Object {
+      "metadata": Object {
+        "annotations": Object {
+          "sealedsecrets.bitnami.com/cluster-wide": "true",
+        },
+        "name": "some-name",
       },
-      "name": "some-name",
+      "type": "Opaque",
     },
-    "type": "Opaque",
   },
 }
 `;
@@ -45,15 +45,15 @@ Object {
       "value1": Any<String>,
       "value2": Any<String>,
     },
-  },
-  "template": Object {
-    "metadata": Object {
-      "annotations": Object {
-        "sealedsecrets.bitnami.com/namespace-wide": "true",
+    "template": Object {
+      "metadata": Object {
+        "annotations": Object {
+          "sealedsecrets.bitnami.com/namespace-wide": "true",
+        },
+        "name": "some-name",
       },
-      "name": "some-name",
+      "type": "Opaque",
     },
-    "type": "Opaque",
   },
 }
 `;
@@ -72,13 +72,13 @@ Object {
       "value1": Any<String>,
       "value2": Any<String>,
     },
-  },
-  "template": Object {
-    "metadata": Object {
-      "annotations": Object {},
-      "name": "some-name",
+    "template": Object {
+      "metadata": Object {
+        "annotations": Object {},
+        "name": "some-name",
+      },
+      "type": "Opaque",
     },
-    "type": "Opaque",
   },
 }
 `;

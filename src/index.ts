@@ -269,13 +269,13 @@ export const getSealedSecret = async (args: GetSealedSecretParams) => {
     },
     spec: {
       encryptedData,
-    },
-    template: {
-      metadata: {
-        annotations,
-        name: args.name,
+      template: {
+        metadata: {
+          annotations,
+          name: args.name,
+        },
+        type: 'Opaque',
       },
-      type: 'Opaque',
     },
   };
 
