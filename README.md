@@ -65,3 +65,16 @@ const result = await HybridEncrypt(publicKey, plainText, label);
 
 const sealedText = Buffer.from(result).toString('base64');
 ```
+
+## Encryption Algorithm
+
+To encrypt content, we go through the following steps :
+
+-   Generate a 128 bits AES key
+
+-   Encrypt the payload using the AES-GCM algorithm (with the previously generated key). We use a 12 bits of 0 as IV, because the key is only used once.
+
+-   Encrypt the AES key using the RSA-OAEP algorithm (using the provided public key).
+
+-   Generate the output payload this way :
+  (RSA payload length as 2 bytes integer) || (RSA encrypted aes key) || (AES encrypted payload)
