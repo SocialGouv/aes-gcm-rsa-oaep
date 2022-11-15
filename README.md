@@ -78,4 +78,3 @@ To encrypt content, we go through the following steps :
 
 -   Generate the output payload this way :
   (RSA payload length as 2 bytes integer) || (RSA encrypted aes key) || (AES encrypted payload)
-
