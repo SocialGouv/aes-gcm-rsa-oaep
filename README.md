@@ -1,4 +1,5 @@
-# AES-GCM + RSA OAEP encryption
+# AES-GCM + RSA OAEP encryption <a href="https://www.npmjs.com/package/@socialgouv/aes-gcm-rsa-oaep"><img src="https://img.shields.io/npm/v/@socialgouv/aes-gcm-rsa-oaep.svg" alt="Npm version"></a> 
+
 
 AES-GCM + RSA-OAEP encryption/decryption using WebCrypto API in NodeJS or in the browser
 
