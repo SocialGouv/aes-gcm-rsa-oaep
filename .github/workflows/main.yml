@@ -14,11 +14,11 @@ jobs:
 
     steps:
       - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Installing
         run: yarn --frozen-lockfile --perfer-offline --link-duplicates
@@ -31,7 +31,7 @@ jobs:
         run: yarn build
 
       - name: Archive dist components
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: dist/
@@ -43,14 +43,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set up Node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: 15.x
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Download dist from build job
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: build
           path: dist
